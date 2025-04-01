@@ -1,5 +1,5 @@
-# Note, you need to be in the dashboard path to call any of the below (..BUDNITZ_RA\dashboard, so my command line says mads@MacBook-Pro-7 dashboard %)
-# Note also, requirements.txt lists library requorements and runtime.txt notes the python version
+# Note, you need to be in the dashboard path to call any of the below Command: cd ..\PLEASEM\dashboard
+# Note also, requirements.txt lists library requorements and runtime.txt notes the python version Command: pip install -r requirements.txt
 # Note also, the data is stored in the cleaned_data folder and the shared.py file is used to import the data (automatically called when running the below commands)
 
 # run app locally via command line command: shiny run --reload --launch-browser app.py
