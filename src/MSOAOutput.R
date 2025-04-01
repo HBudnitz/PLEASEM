@@ -3,7 +3,7 @@ rootfolder <- strsplit(rstudioapi::getSourceEditorContext()$path, 'code')[[1]][1
 library(dplyr)
 library(data.table)
 #upload lookup files to include LSOA and MSOA codes inc LSOA 2011 for fleet data
-LookupPC <- fread("../PCD_OA21_LSOA21_MSOA21_LAD_NOV23_UK_LU.csv")
+LookupPC <- fread("LookupLtoMSOA21.csv")
 LookupPC <- LookupPC[,c(8:9)]
 names(LookupPC)[1] <- "LSOA21CD"
 names(LookupPC)[2] <- "MSOA21CD"
