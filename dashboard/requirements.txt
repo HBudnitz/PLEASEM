@@ -1,0 +1,10 @@
+faicons
+shiny
+seaborn
+pandas
+plotly
+shinywidgets
+numpy
+geopandas
+matplotlib
+nbformat

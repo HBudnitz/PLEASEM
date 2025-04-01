@@ -1,0 +1,12 @@
+{
+    "https://api.shinyapps.io": {
+        "server_url": "https://api.shinyapps.io",
+        "filename": "/Users/mads/Desktop/Budnitz_RA/dashboard",
+        "app_url": "https://car-club-potential.shinyapps.io/dashboard/",
+        "app_id": 14144959,
+        "app_guid": null,
+        "title": "dashboard",
+        "app_mode": "python-shiny",
+        "app_store_version": 1
+    }
+}
