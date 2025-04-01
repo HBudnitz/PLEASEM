@@ -1,9 +1,9 @@
 library(dplyr)
 #traffic by LTA
-Traffic <- read.csv("../local_authority_traffic.csv")
+Traffic <- read.csv("../data/raw_data/local_authority_traffic.csv")
 Traffic <- Traffic[which(Traffic$year == 2023),c(2:3,5:8)]
 names(Traffic)[1:2]<-c("Local Authority","Local Authority Code")
-VehFleet <- read.csv("../VehReg.csv")
+VehFleet <- read.csv("../data/raw_data/VehReg.csv")
 VehFleet <- VehFleet[,2:7]
 VehFleet$BodyType <- as.factor(VehFleet$BodyType)
 VehFleet$Fuel <- as.factor(VehFleet$Fuel)
@@ -20,7 +20,7 @@ Petrol <- VehFleet[which(VehFleet$Fuel == "Petrol"),c(4,6)]
 names(Petrol)[2] <- "Petrol2024Q2"
 VehFleet <- left_join(Petrol, Diesel)
 VehFleet <- left_join(VehFleet, Hybrid)
-Electric <- read.csv("../PiEVReg.csv")
+Electric <- read.csv("../data/raw_data/PiEVReg.csv")
 Electric <- Electric[,2:7]
 Electric$BodyType <- as.factor(Electric$BodyType)
 Electric$Fuel <- as.factor(Electric$Fuel)
@@ -55,8 +55,14 @@ VehFleet$Hybrid <- VehFleet$Hybrid2024Q2/VehFleet$TotalCars
 VehFleet$BEV <- VehFleet$BEV2024Q2/VehFleet$TotalCars
 VehFleet$PHEV <- VehFleet$PHEV2024Q2/VehFleet$TotalCars
 TrafficFleet <- left_join(VehFleet, Traffic) #421 upper and lower tier authorities
-#4 LAs not included or have different codes in VehFleet files that are in Mileage files
-#not inc: Somerset and North Yorkshire (lower tier included), Cumberland and Westmorland and Furness
+#4 upper tier LAs have different codes in VehFleet files that are in Mileage files
+#Somerset and North Yorkshire (change lower tier code to upper tier code)
+TrafficFleet$`Local Authority Code` <- if_else(TrafficFleet$`Local Authority Code` == "E10000027", 
+                                               "E06000066", TrafficFleet$`Local Authority Code`)
+TrafficFleet$`Local Authority Code` <- if_else(TrafficFleet$`Local Authority Code` == "E10000023", 
+                                               "E06000065", TrafficFleet$`Local Authority Code`)
+
+#Cumberland and Westmorland and Furness
 #218 NAs
 TrafficFleet$PetrolMile <- TrafficFleet$cars_and_taxis*TrafficFleet$Petrol
 TrafficFleet$DieselMile <- TrafficFleet$cars_and_taxis*TrafficFleet$Diesel
@@ -77,22 +83,4 @@ TrafficFleet$pBEVAnnCO2e <- TrafficFleet$pCarAnnMile*0.07015+(TrafficFleet$pCarA
 TrafficFleet$pHyVAnnCO2e <- TrafficFleet$pCarAnnMile*0.20288
 TrafficFleet$reduceCO2pBEVcc <- TrafficFleet$pCarBaseCO2e - TrafficFleet$pBEVAnnCO2e
 TrafficFleet$reduceCO2pHyVc <- TrafficFleet$pCarBaseCO2e - TrafficFleet$pHyVAnnCO2e
-write.csv(TrafficFleet, "LAoutputFleet.csv")
-
-LATrafEmit <- left_join(LAemit,Traffic)
-Co2Conv <- read.csv("../ghg-conversion-factors-2024-full_set__for_advanced_users__v1_1.csv")
-
-#test if same mean annual mileage per vehicle
-CarClubMileage <- read.csv("CClubBUA_OA.csv")
-names (CarClubMileage) [15]<- "pCarAnnMile"
-t.test(CarClubMileage$pCarAnnMile, LAOutput$pCarAnnMile)
-#Welch Two Sample t-test
-
-#data:  CarClubMileage$pCarAnnMile and LAOutput$pCarAnnMile
-#t = 5.2262, df = 624.88, p-value = 2.362e-07
-#alternative hypothesis: true difference in means is not equal to 0
-#95 percent confidence interval:
-#        1135.368 2502.218
-#sample estimates:
-#        mean of x mean of y 
-#9280.615  7461.822
+write.csv(TrafficFleet, "../data/processed_data/LAoutputFleet.csv")
