@@ -28,7 +28,7 @@ ui.tags.head(
 )
 
 lad_cd_list = [gdf_lad24cd['features'][i]['properties']['CTYUA24CD'] for i in range(len(gdf_lad24cd['features']))]
-level_dic = {'LAD22NM': 'Local Authority District', 'MSOA21CD': 'Middle Layer Super Output Area'}
+level_dic = {'LAD22NM': 'Local Authority District', 'MSOA21CD': 'Middle Layer Super Output Area (2,000-6,000 households)'}
 
 ui.page_opts(title="PLEASEM: PLace-based Estimated Advantages of Shared Electric Mobility", fillable=True)
 
@@ -318,7 +318,7 @@ with ui.layout_columns(col_widths=[8, 4]):
                     "<b>%{customdata[0]}</b><br>" +
                     "Avg. # of cars (per household): %{customdata[1]:.2f}<br>" +
                     "Share of EVs in car fleet: %{customdata[4]:.2f}%<br>" +
-                    "Percentage change of EVs/household<br>per CC vehicle introduced (weighted by MSOA): %{customdata[2]:.3f}%<br>" +
+                    "Percentage change of EV drivers<br>per CC vehicle introduced (weighted by MSOA): %{customdata[2]:.3f}%<br>" +
                     "Change in avg. # of cars/household<br>per CC vehicle introduced (weighted by MSOA): %{customdata[3]:.3f}<br>"
                 )
                 data = df_lad.copy()
@@ -332,14 +332,14 @@ with ui.layout_columns(col_widths=[8, 4]):
                     "<b>%{customdata[0]}</b><br>" +
                     "Avg. # of cars (per household): %{customdata[1]:.2f}<br>" +
                     "Share of EVs in car fleet: %{customdata[4]:.2f}%<br>" +
-                    "Percentage change of EVs/household<br>per CC vehicle introduced: %{customdata[2]:.3f}%<br>" +
+                    "Percentage change of EV drivers<br>per CC vehicle introduced: %{customdata[2]:.3f}%<br>" +
                     "Change in avg. # of cars/household<br>per CC vehicle introduced: %{customdata[3]:.3f}<br>"
                 )
                 data = df_msoa.copy()
 
             plot_var = input.metric2()
             if plot_var == 'ChangeEVuptake':
-                label = 'Percentage change of<br>EVs/household<br>per CC vehicle introduced<br>(Deciles)'
+                label = 'Percentage change of<br>EV drivers<br>per CC vehicle introduced<br>(Deciles)'
             elif plot_var == 'CCredCarOwn':
                 label = 'Change in avg. # of<br>cars/household<br>per CC vehicle introduced<br>(Deciles)'
 
@@ -461,7 +461,7 @@ with ui.layout_columns(col_widths=[8, 4]):
                         f"**Selected location:** {loc_auth}<br>"
                         f"**Car Ownership Rate:** {round(car_own_rate, 2)} cars per household.<br>"
                         f"**EV Share in overall car fleet without CC:** {round(ev_rate, 2)}% of {int(total_cars)} total registered vehicles.<br>"
-                    ), ui.card_footer(f"Note: Variables are weighted averages across all MSOAs (made up of 2,000-6,000 households) encompassed by {loc_auth}. To illustrate, the ''Change of BEV/household per BEV introduced to CC fleet'' is an average change if a shared BEV was introduced in every MSOA or multiple shared BEVs serving more than one adjacent MSOA."),
+                    ), ui.card_footer(f"Note: Weighted averages are used to account for differences in household numbers within LSOAs and MSOAs encompassed by {loc_auth}, to reflect that the change is per shared BEV, whether one is introduced in every MSOA, no matter its population or multiple shared BEVs serve more than one adjacent MSOA."),
                 else:
                     return ui.markdown(
                         f"**Selected location:** {loc_auth}<br>"
