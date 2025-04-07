@@ -9,9 +9,9 @@ import pandas as pd
 data_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'processed_data')
 
 # define fleet data
-df_county = pd.read_csv(data_folder / "df_county.csv")
-df_lad = pd.read_csv(data_folder / "df_lad.csv")
-df_msoa = pd.read_csv(data_folder / "df_msoa.csv")
+df_county = pd.read_csv(data_folder / "processed_data/df_county.csv")
+df_lad = pd.read_csv(data_folder / "processed_data/df_lad.csv")
+df_msoa = pd.read_csv(data_folder / "processed_data/df_msoa.csv")
 
 # define path to the app directory
 app_dir = Path(__file__).parent
