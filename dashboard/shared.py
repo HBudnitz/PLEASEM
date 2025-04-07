@@ -9,9 +9,9 @@ import pandas as pd
 app_dir = Path(__file__).parent
 
 # define fleet data
-df_county = pd.read_csv(app_dir / "cleaned_data/df_county.csv")
-df_lad = pd.read_csv(app_dir / "cleaned_data/df_lad.csv")
-df_msoa = pd.read_csv(app_dir / "cleaned_data/df_msoa.csv")
+df_county = pd.read_csv(app_dir / "processed_data/df_county.csv")
+df_lad = pd.read_csv(app_dir / "processed_data/df_lad.csv")
+df_msoa = pd.read_csv(app_dir / "processed_data/df_msoa.csv")
 
 # define shape file for LAD22NM
 gdf_lad22nm_path = os.path.join(app_dir, 'cleaned_data', 'simplified_geojson_lad22nm.geojson')
