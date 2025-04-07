@@ -5,13 +5,16 @@ import os
 
 import pandas as pd
 
-# define path to the app directory
-app_dir = Path(__file__).parent
+# Navigate up one level from the dashboard folder, then into data/processed_data
+data_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'processed_data')
 
 # define fleet data
-df_county = pd.read_csv(app_dir / "processed_data/df_county.csv")
-df_lad = pd.read_csv(app_dir / "processed_data/df_lad.csv")
-df_msoa = pd.read_csv(app_dir / "processed_data/df_msoa.csv")
+df_county = pd.read_csv(data_folder / "df_county.csv")
+df_lad = pd.read_csv(data_folder / "df_lad.csv")
+df_msoa = pd.read_csv(data_folder / "df_msoa.csv")
+
+# define path to the app directory
+app_dir = Path(__file__).parent
 
 # define shape file for LAD22NM
 gdf_lad22nm_path = os.path.join(app_dir, 'cleaned_data', 'simplified_geojson_lad22nm.geojson')
