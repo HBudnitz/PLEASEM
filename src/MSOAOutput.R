@@ -98,7 +98,7 @@ MSOAoutput$EVRateincCC <- (MSOAoutput$EVincCC/(MSOAoutput$VehsReg - 8))
 #MSOAoutput$ChangeEVuptake <- (MSOAoutput$EVRateincCC - MSOAoutput$EVRate)*100
 #MSOA changes in EV uptake weighted by LSOA household numbers
 W_CCEVuptakeMSOA <- summarise(group_by(LSOAoutput, MSOA21CD),
-                             weighted.mean(ChangeEVuptake, TotHhold))
+                             weighted.mean(ChangeEVuptake, TotHhold, na.rm = T))
 names(W_CCEVuptakeMSOA)[2]<- "ChangeEVuptake"
 MSOAoutput <- left_join(MSOAoutput, W_CCEVuptakeMSOA)
 MSOAoutput <- MSOAoutput %>%
@@ -127,7 +127,7 @@ LADoutput$CCCarOwn <- LADoutput$CarRedincCC/LADoutput$TotHhold
 #LADoutput$CCredCarOwn <- (LADoutput$CCCarOwn - LADoutput$CarOwnRates)
 #LAD reduction in car ownership weighted by LSOA household numbers
 W_CCredCarOwnLAD <- summarise(group_by(MSOAoutput, LAD22CD),
-                        weighted.mean(CCredCarOwn, TotHhold))
+                        weighted.mean(CCredCarOwn, TotHhold, na.rm = T))
 names(W_CCredCarOwnLAD)[2]<- "CCredCarOwn"
 LADoutput <- left_join(LADoutput, W_CCredCarOwnLAD)
 #LAD changes in EV uptake unweighted by LSOA household numbers
@@ -136,7 +136,7 @@ LADoutput$EVRateincCC <- (LADoutput$EVincCC/(LADoutput$VehsReg-8))
 #LADoutput$ChangeEVuptake <- (LADoutput$EVRateincCC - LADoutput$EVRate)*100
 #LAD changes in EV uptake unweighted by LSOA household numbers
 W_CCEVuptakeLAD <- summarise(group_by(MSOAoutput, LAD22CD),
-                              weighted.mean(ChangeEVuptake, TotHhold))
+                              weighted.mean(ChangeEVuptake, TotHhold, na.rm = T))
 names(W_CCEVuptakeLAD)[2]<- "ChangeEVuptake"
 LADoutput <- left_join(LADoutput, W_CCEVuptakeLAD)
 write.csv(LADoutput, "../dashboard/data/processed_data/df_lad.csv")
