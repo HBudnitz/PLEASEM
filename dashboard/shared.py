@@ -9,7 +9,7 @@ import pandas as pd
 app_dir = Path(__file__).parent
 
 # Navigate up one level from the dashboard folder, then into data/processed_data
-data_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'processed_data')
+data_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dashboard', 'data', 'processed_data')
 
 # define fleet data
 df_county = pd.read_csv(os.path.join(data_folder, "df_county.csv"))

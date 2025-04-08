@@ -12,7 +12,7 @@ tolerance <- 0.05
 
 # Define parent directory
 rootfolder <- strsplit(rstudioapi::getSourceEditorContext()$path, 'src')[[1]][1]
-parent_dir <- file.path(rootfolder, "data", "processed_data")
+parent_dir <- file.path(rootfolder, "dashboard", "data", "processed_data")
 parent_dir
 
 # Function to fetch GeoJSON from REST API
