@@ -346,7 +346,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             hover_data = {col: True for col in hover_vars}
             data.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
             data.dropna(subset=['ChangeEVuptake', 'CCredCarOwn', 'EVRate'], inplace=True)
-            data['CCredCarOwn'] = data['CCredCarOwn'] * 100
+            data['CCredCarOwn'] = data['CCredCarOwn']
             data['EVRate'] = data['EVRate'] * 100
 
             # data filtering options
@@ -464,7 +464,7 @@ with ui.layout_columns(col_widths=[8, 4]):
                         f"**Selected location:** {loc_auth}<br>"
                         f"**Car Ownership Rate:** {round(car_own_rate, 2)} cars per household.<br>"
                         f"**EV Share in overall car fleet without CC:** {round(ev_rate, 2)}% of {int(total_cars)} total registered vehicles.<br>"
-                    ), ui.card_footer(f"Note: Weighted averages are used to account for differences in household numbers within LSOAs and MSOAs encompassed by {loc_auth}, to reflect that the change is per shared BEV, whether one is introduced in every MSOA, no matter its population or multiple shared BEVs serve more than one adjacent MSOA."),
+                    ), ui.card_footer(f"Note: Weighted averages are used to account for differences in household numbers within LSOAs and MSOAs encompassed by {loc_auth}, to reflect that the change is per shared BEV, whether one is introduced in every MSOA, no matter its population, or if multiple shared BEVs serve more than one adjacent MSOA."),
                 else:
                     return ui.markdown(
                         f"**Selected location:** {loc_auth}<br>"
