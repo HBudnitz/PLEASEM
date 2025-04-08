@@ -107,6 +107,14 @@ MSOAoutput <- MSOAoutput %>%
 write.csv(MSOAoutput, "../dashboard/data/processed_data/df_msoa.csv")
 #aggregate LADNM, total households, car ownership and EV uptake by LAD into new df
 LAD22NM <- distinct(LSOAoutput[,c("LAD22CD","LAD22NM")])
+#Three authorities have different names on the geojson
+LAD22NM$LAD22NM <- if_else(LAD22NM$LAD22NM == "Herefordshire", 
+                           "Herefordshire, County of", LAD22NM$LAD22NM)
+LAD22NM$LAD22NM <- if_else(LAD22NM$LAD22NM == "Bristol", 
+                           "Bristol, City of", LAD22NM$LAD22NM)
+LAD22NM$LAD22NM <- if_else(LAD22NM$LAD22NM == "Kingston upon Hull", 
+                           "Kingston upon Hull, City of", LAD22NM$LAD22NM)
+
 TotHholdLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
                           sum(TotHhold))
 names(TotHholdLAD) [2] <- "TotHhold"
