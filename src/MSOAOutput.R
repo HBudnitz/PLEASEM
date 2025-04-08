@@ -1,15 +1,15 @@
 library(dplyr)
 library(data.table)
 #upload lookup files to include LSOA and MSOA 2021 codes then LSOA 2011 codes for fleet data
-Lookup21 <- read.csv("../data/raw_data/LookupLtoMSOA21.csv") #43501obs
-Lookup2011 <- read.csv("../data/raw_data/LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Lookup_for_England_and_Wales.csv")
+Lookup21 <- read.csv("../dashboard/data/raw_data/LookupLtoMSOA21.csv") #43501obs
+Lookup2011 <- read.csv("../dashboard/data/raw_data/LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Lookup_for_England_and_Wales.csv")
 Lookup2011 <- Lookup2011[,c(1,3,5:6)]
 names (Lookup2011)[1] <- "LSOA11CD"
 Lookup <- left_join(Lookup21, Lookup2011) #43621obs
 #Total Hholds by LSOA
 #data from census: https://www.nomisweb.co.uk/query/select/getdatasetbytheme.asp
 #select census 2021, Table 041 number of households, geography: all 2021 super output areas - lower layer 
-HHolds <- read.csv("../data/raw_data/HHoldNumbers.csv")
+HHolds <- read.csv("../dashboard/data/raw_data/HHoldNumbers.csv")
 HHolds$X2021.super.output.area...lower.layer <- 
         substr(HHolds$X2021.super.output.area...lower.layer,1,9)
 names(HHolds) <- c("LSOA21CD","TotHhold")
@@ -18,7 +18,7 @@ LSOAoutput <- left_join(Lookup, HHolds)
 #Add Car registration rates by LSOA
 #Table veh0125: https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-files
 #Columns 1, 3, 4, 5, and 6 extracted to reduce size to save to Github
-AllVehReg <- fread("../data/raw_data/df_VEH0125_col13456.csv")
+AllVehReg <- fread("../dashboard/data/raw_data/df_VEH0125_col13456.csv")
 AllVehReg$LicenceStatus <- as.factor(AllVehReg$LicenceStatus)
 #remove 'SORN' as are registered as such if broken, untaxed, etc - not allowed on road
 AllVehReg <- AllVehReg[which(AllVehReg$LicenceStatus == "Licensed"),]
@@ -44,7 +44,7 @@ LSOAoutput$CarOwnRates <- LSOAoutput$VehsReg2024Q2 / LSOAoutput$TotHhold
 #EV registrations by LSOA - all plug-in vehicles, inc hybrids and Range extended
 #Table veh0145: https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-files
 #Columns 1, 3, 4, and 5 extracted to reduce size to save to Github
-EVReg <- fread("../data/raw_data/df_VEH0145_col1345.csv")
+EVReg <- fread("../dashboard/data/raw_data/df_VEH0145_col1345.csv")
 names(EVReg)[1] <- "LSOA11CD" 
 EVReg$Fuel <- as.factor(EVReg$Fuel)
 EVReg$Keepership <- as.factor(EVReg$Keepership)
@@ -67,14 +67,16 @@ LSOAoutput$CCredCarOwn <- (LSOAoutput$CCCarOwn - LSOAoutput$CarOwnRates)
 LSOAoutput$EVincCC <- (LSOAoutput$EV2024Q2 + 9)
 LSOAoutput$EVRateincCC <- (LSOAoutput$EVincCC/(LSOAoutput$VehsReg2024Q2-8))
 LSOAoutput$ChangeEVuptake <- (LSOAoutput$EVRateincCC - LSOAoutput$EVRate)*100
-#aggregate populations, total households, car ownership and EV uptake by MSOA into new df
+#aggregate LAD22CD&NM, total households, car ownership and EV uptake by MSOA into new df
+MSOA_LAD22NM <- distinct(LSOAoutput[,c("MSOA21CD","LAD22CD","LAD22NM")])
 TotHholdMSOA <- summarise(group_by(LSOAoutput, MSOA21CD), 
                           sum(TotHhold, na.rm = T))
 names(TotHholdMSOA)[2] <- "TotHhold"
+MSOAoutput <- left_join(MSOA_LAD22NM, TotHholdMSOA)
 VehsRegMSOA <- summarise(group_by(LSOAoutput, MSOA21CD), 
                            sum(VehsReg2024Q2, na.rm = T))
 names(VehsRegMSOA)[2]<- "VehsReg"
-MSOAoutput <- left_join(TotHholdMSOA, VehsRegMSOA)
+MSOAoutput <- left_join(MSOAoutput, VehsRegMSOA)
 MSOAoutput$CarOwnRates <- MSOAoutput$VehsReg / MSOAoutput$TotHhold
 EVRegMSOA <- summarise(group_by(LSOAoutput, MSOA21CD), 
                        sum(EV2024Q2, na.rm = T))
@@ -99,15 +101,20 @@ W_CCEVuptakeMSOA <- summarise(group_by(LSOAoutput, MSOA21CD),
                              weighted.mean(ChangeEVuptake, TotHhold))
 names(W_CCEVuptakeMSOA)[2]<- "ChangeEVuptake"
 MSOAoutput <- left_join(MSOAoutput, W_CCEVuptakeMSOA)
-write.csv(MSOAoutput, "../data/processed_data/df_msoa.csv")
-#aggregate total households, car ownership and EV uptake by LAD into new df
+MSOAoutput <- MSOAoutput %>%
+  mutate(MSOACD_LADNM = paste(LAD22NM, " (", MSOA21CD, ")", sep = "")) %>%
+  arrange(MSOACD_LADNM)
+write.csv(MSOAoutput, "../dashboard/data/processed_data/df_msoa.csv")
+#aggregate LADNM, total households, car ownership and EV uptake by LAD into new df
+LAD22NM <- distinct(LSOAoutput[,c("LAD22CD","LAD22NM")])
 TotHholdLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
                           sum(TotHhold, na.rm = T))
 names(TotHholdLAD) [2] <- "TotHhold"
-VehsRegLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
-                         sum(VehsReg2024Q2, na.rm = T))
+LADoutput <- left_join(LAD22NM,TotHholdLAD)
+VehsRegLAD <- LSOAoutput %>% group_by(LAD22CD) %>%
+                         summarise(VehsReg2024Q2, na.rm = T)
 names(VehsRegLAD)[2]<- "VehsReg"
-LADoutput <- left_join(TotHholdLAD, VehsRegLAD)
+LADoutput <- left_join(LADoutput, VehsRegLAD)
 LADoutput$CarOwnRates <- LADoutput$VehsReg / LADoutput$TotHhold
 EVRegLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
                        sum(EV2024Q2, na.rm = T))
@@ -119,7 +126,7 @@ LADoutput$CarRedincCC <- (LADoutput$VehsReg - 9)
 LADoutput$CCCarOwn <- LADoutput$CarRedincCC/LADoutput$TotHhold
 #LADoutput$CCredCarOwn <- (LADoutput$CCCarOwn - LADoutput$CarOwnRates)
 #LAD reduction in car ownership weighted by LSOA household numbers
-W_CCredCarOwnLAD <- summarise(group_by(LSOAoutput, LAD22CD),
+W_CCredCarOwnLAD <- summarise(group_by(MSOAoutput, LAD22CD),
                         weighted.mean(CCredCarOwn, TotHhold))
 names(W_CCredCarOwnLAD)[2]<- "CCredCarOwn"
 LADoutput <- left_join(LADoutput, W_CCredCarOwnLAD)
@@ -128,8 +135,8 @@ LADoutput$EVincCC <- (LADoutput$EVReg + 9)
 LADoutput$EVRateincCC <- (LADoutput$EVincCC/(LADoutput$VehsReg-8))
 #LADoutput$ChangeEVuptake <- (LADoutput$EVRateincCC - LADoutput$EVRate)*100
 #LAD changes in EV uptake unweighted by LSOA household numbers
-W_CCEVuptakeLAD <- summarise(group_by(LSOAoutput, LAD22CD),
+W_CCEVuptakeLAD <- summarise(group_by(MSOAoutput, LAD22CD),
                               weighted.mean(ChangeEVuptake, TotHhold))
 names(W_CCEVuptakeLAD)[2]<- "ChangeEVuptake"
 LADoutput <- left_join(LADoutput, W_CCEVuptakeLAD)
-write.csv(LADoutput, "../data/processed_data/df_lad.csv")
+write.csv(LADoutput, "../dashboard/data/processed_data/df_lad.csv")

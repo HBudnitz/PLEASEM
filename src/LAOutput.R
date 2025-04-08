@@ -1,13 +1,13 @@
 library(dplyr)
 #data on mileage on upper tier authority on all roads within that authority
 #https://roadtraffic.dft.gov.uk/downloads (Local authority traffic)
-Traffic <- read.csv("../data/raw_data/local_authority_traffic.csv")
+Traffic <- read.csv("../dashboard/data/raw_data/local_authority_traffic.csv")
 Traffic <- Traffic[which(Traffic$year == 2023),c(2:3,5:8)]
 names(Traffic)[1:2]<-c("Local Authority","Local Authority Code")
 #data on vehicle fleet makeup by upper and lower tier local authority
 #Table veh0105: https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-tables
 #extract data for all (private and company) cars (body type) by fuel type
-VehFleet <- read.csv("../data/raw_data/VehReg.csv")
+VehFleet <- read.csv("../dashboard/data/raw_data/VehReg.csv")
 VehFleet <- VehFleet[,2:7]
 VehFleet$BodyType <- as.factor(VehFleet$BodyType)
 VehFleet$Fuel <- as.factor(VehFleet$Fuel)
@@ -27,7 +27,7 @@ VehFleet <- left_join(VehFleet, Hybrid)
 #Data on full EVs and plug in hybrids
 #Table veh0142: https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-tables
 #extract data for all (private and company) cars (body type) by fuel type
-Electric <- read.csv("../data/raw_data/PiEVReg.csv")
+Electric <- read.csv("../dashboard/data/raw_data/PiEVReg.csv")
 Electric <- Electric[,2:7]
 Electric$BodyType <- as.factor(Electric$BodyType)
 Electric$Fuel <- as.factor(Electric$Fuel)
@@ -118,4 +118,4 @@ TrafficFleet$pHyVAnnCO2e <- TrafficFleet$pCarAnnMile*0.20288
 TrafficFleet$reduceCO2pBEVcc <- TrafficFleet$pCarBaseCO2e - TrafficFleet$pBEVAnnCO2e
 TrafficFleet$reduceCO2pHyVc <- TrafficFleet$pCarBaseCO2e - TrafficFleet$pHyVAnnCO2e
 #output to use in mapping
-write.csv(TrafficFleet, "../data/processed_data/LAoutputFleet.csv")
+write.csv(TrafficFleet, "../dashboard/data/processed_data/LAoutputFleet.csv")
