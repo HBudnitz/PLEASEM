@@ -14,7 +14,7 @@ from shinywidgets import render_plotly
 import numpy as np
 
 # Import data from shared.py
-from shared import app_dir, df_county, df_lad, df_msoa, gdf_lad22nm, gdf_msoa, gdf_lad24cd
+from shared import app_dir, df_county, df_lad, df_msoa, gdf_lad22nm, gdf_msoa, gdf_county
 
 from shiny import App, reactive
 from shiny.express import input, render, ui
@@ -27,7 +27,7 @@ ui.tags.head(
     """)
 )
 
-lad_cd_list = [gdf_lad24cd['features'][i]['properties']['CTYUA24CD'] for i in range(len(gdf_lad24cd['features']))]
+lad_cd_list = [gdf_county['features'][i]['properties']['CTYUA24CD'] for i in range(len(gdf_county['features']))]
 level_dic = {'LAD22NM': 'Local Authority District', 'MSOA21CD': 'Middle Layer Super Output Area (2,000-6,000 households)'}
 
 ui.page_opts(title="PLEASEM: PLace-based Estimated Advantages of Shared Electric Mobility", fillable=True)
@@ -140,9 +140,9 @@ with ui.layout_columns(col_widths=[8, 4]):
                 label = 'CO2e reduction potential (kg)<br>per car club Hybrid'
                 fig_trace_lab = "Hybrid"
 
-            loc_var = 'Local.Authority.Code'
+            loc_var = 'Local Authority Code'
             geojson_loc_var = 'properties.CTYUA24CD'
-            hover_vars = ['Local.Authority', 'TotalCars', 'BEV', 'Hybrid', 'pCarAnnMile', plot_var]
+            hover_vars = ['Local Authority', 'TotalCars', 'BEV', 'Hybrid', 'pCarAnnMile', plot_var]
             hover_data = {col: True for col in hover_vars}
             data = df_county.copy()
             data = data.dropna(subset=plot_var)
@@ -152,7 +152,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             # plot map
             fig = px.choropleth_mapbox(
                 data,
-                geojson=gdf_lad24cd,
+                geojson=gdf_county,
                 locations=loc_var,
                 color=plot_var,
                 featureidkey=geojson_loc_var,
@@ -182,10 +182,10 @@ with ui.layout_columns(col_widths=[8, 4]):
 
     with ui.card(full_screen=True):
 
-        data_locations = set(df_county['Local.Authority.Code'].unique())
-        geojson_locations = set([feature['properties']['CTYUA24CD'] for feature in gdf_lad24cd['features']])
+        data_locations = set(df_county['Local Authority Code'].unique())
+        geojson_locations = set([feature['properties']['CTYUA24CD'] for feature in gdf_county['features']])
         overlapping_locations = list(data_locations.intersection(geojson_locations))
-        data = df_county[df_county['Local.Authority.Code'].isin(overlapping_locations)].dropna(subset=['pCarAnnMile'])
+        data = df_county[df_county['Local Authority Code'].isin(overlapping_locations)].dropna(subset=['pCarAnnMile'])
 
         @render.ui
         def county_select():
@@ -201,15 +201,15 @@ with ui.layout_columns(col_widths=[8, 4]):
         ui.input_select(
             "metric1_lad",
             "",
-            sorted(data['Local.Authority'].to_list()),
-            selected=sorted(data['Local.Authority'].to_list())[0],
+            sorted(data['Local Authority'].to_list()),
+            selected=sorted(data['Local Authority'].to_list())[0],
         )
 
         @render.ui
         def loc_auth_pcar_mil():
             loc_auth = input.metric1_lad()
             return ui.markdown(
-                f"**Avg. annual car mileage: {int(df_county[df_county['Local.Authority']==loc_auth]['pCarAnnMile'].iloc[0])} miles** in {loc_auth}"
+                f"**Avg. annual car mileage: {int(df_county[df_county['Local Authority']==loc_auth]['pCarAnnMile'].iloc[0])} miles** in {loc_auth}"
             )
 
         @render.ui
@@ -218,7 +218,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             selected_loc = input.metric1_lad()
             
             # Filter the DataFrame for the selected local authority.
-            base_val = df_county[df_county['Local.Authority'] == selected_loc]['pCarAnnMile'].iloc[0]
+            base_val = df_county[df_county['Local Authority'] == selected_loc]['pCarAnnMile'].iloc[0]
             min_val = round(base_val*0.5,0)
             init_val = round(base_val,0)
             max_val = round(base_val*1.5,0)
@@ -243,9 +243,9 @@ with ui.layout_columns(col_widths=[8, 4]):
             elif plot_var == 'reduceCO2pHyVc':
                 fig_trace_lab = "Hybrid"
 
-            mil = int(df_county[df_county['Local.Authority']==loc_auth]['pCarAnnMile'].iloc[0])
+            mil = int(df_county[df_county['Local Authority']==loc_auth]['pCarAnnMile'].iloc[0])
             em_red_pot_multiplier = sel_mil/mil
-            em_red_pot = df_county[df_county['Local.Authority']==loc_auth][plot_var].iloc[0]*em_red_pot_multiplier
+            em_red_pot = df_county[df_county['Local Authority']==loc_auth][plot_var].iloc[0]*em_red_pot_multiplier
             return ui.markdown(
                 f"**Emission reduction potential** per car club {fig_trace_lab} in {loc_auth}: **{int(em_red_pot)}kg CO2e** at **{sel_mil} miles** and existing **private car fleet split** (see pie chart below)"
                 )
@@ -253,7 +253,7 @@ with ui.layout_columns(col_widths=[8, 4]):
         @render_plotly
         def panel_1_pie():
             loc_auth = input.metric1_lad()
-            data = df_county[df_county['Local.Authority']==loc_auth][['Petrol', 'Diesel', 'Hybrid', 'BEV', 'PHEV']].iloc[0].to_dict()
+            data = df_county[df_county['Local Authority']==loc_auth][['Petrol', 'Diesel', 'Hybrid', 'BEV', 'PHEV']].iloc[0].to_dict()
             colors = {'Petrol':'peru',
                     'Diesel':'darkkhaki',
                     'Hybrid':'forestgreen',
