@@ -70,11 +70,11 @@ LSOAoutput$ChangeEVuptake <- (LSOAoutput$EVRateincCC - LSOAoutput$EVRate)*100
 #aggregate LAD22CD&NM, total households, car ownership and EV uptake by MSOA into new df
 MSOA_LAD22NM <- distinct(LSOAoutput[,c("MSOA21CD","LAD22CD","LAD22NM")])
 TotHholdMSOA <- summarise(group_by(LSOAoutput, MSOA21CD), 
-                          sum(TotHhold, na.rm = T))
+                          sum(TotHhold))
 names(TotHholdMSOA)[2] <- "TotHhold"
 MSOAoutput <- left_join(MSOA_LAD22NM, TotHholdMSOA)
 VehsRegMSOA <- summarise(group_by(LSOAoutput, MSOA21CD), 
-                           sum(VehsReg2024Q2, na.rm = T))
+                           sum(VehsReg2024Q2))
 names(VehsRegMSOA)[2]<- "VehsReg"
 MSOAoutput <- left_join(MSOAoutput, VehsRegMSOA)
 MSOAoutput$CarOwnRates <- MSOAoutput$VehsReg / MSOAoutput$TotHhold
@@ -108,11 +108,11 @@ write.csv(MSOAoutput, "../dashboard/data/processed_data/df_msoa.csv")
 #aggregate LADNM, total households, car ownership and EV uptake by LAD into new df
 LAD22NM <- distinct(LSOAoutput[,c("LAD22CD","LAD22NM")])
 TotHholdLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
-                          sum(TotHhold, na.rm = T))
+                          sum(TotHhold))
 names(TotHholdLAD) [2] <- "TotHhold"
 LADoutput <- left_join(LAD22NM,TotHholdLAD)
-VehsRegLAD <- LSOAoutput %>% group_by(LAD22CD) %>%
-                         summarise(VehsReg2024Q2, na.rm = T)
+VehsRegLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
+                        sum(VehsReg2024Q2))
 names(VehsRegLAD)[2]<- "VehsReg"
 LADoutput <- left_join(LADoutput, VehsRegLAD)
 LADoutput$CarOwnRates <- LADoutput$VehsReg / LADoutput$TotHhold
