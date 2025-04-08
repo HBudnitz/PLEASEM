@@ -1,7 +1,9 @@
+# This script loads the necessary county, LAD, and MSOA GeoJSON files from the UK government API,
+# simplifies them using the rmapshaper package, and saves the simplified versions to a specified directory.
+
 # Load required libraries
 library(sf)
 library(rmapshaper)
-install.packages("rmapshaper")
 library(jsonlite)
 library(httr)
 

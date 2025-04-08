@@ -441,7 +441,10 @@ with ui.layout_columns(col_widths=[8, 4]):
             data, level_var = get_data()
 
             if level_var == 'MSOA21CD':
-                level_loc_auth = data[data['MSOACD_LADNM'] == loc_auth]['MSOA21CD'].iloc[0]
+                try:
+                    level_loc_auth = data[data['MSOACD_LADNM'] == loc_auth]['MSOA21CD'].iloc[0]
+                except:
+                    level_loc_auth = 'N/A'
                 try:
                     lad_var = data[data[level_var] == level_loc_auth]['LAD22NM'].iloc[0]
                 except:
@@ -488,7 +491,10 @@ with ui.layout_columns(col_widths=[8, 4]):
             data, level_var = get_data()
 
             if level_var == 'MSOA21CD':
-                level_loc_auth = data[data['MSOACD_LADNM'] == loc_auth]['MSOA21CD'].iloc[0]
+                try:
+                    level_loc_auth = data[data['MSOACD_LADNM'] == loc_auth]['MSOA21CD'].iloc[0]
+                except:
+                    level_loc_auth = 'N/A'
             else:
                 level_loc_auth = loc_auth
 
