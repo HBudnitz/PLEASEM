@@ -338,10 +338,10 @@ with ui.layout_columns(col_widths=[8, 4]):
                 data = df_msoa.copy()
 
             plot_var = input.metric2()
-            if plot_var == 'ChangeEVuptake':
-                label = 'Percentage change of<br>EV drivers<br>per CC vehicle introduced<br>(Deciles)'
-            elif plot_var == 'CCredCarOwn':
+            if plot_var == 'CCredCarOwn':
                 label = 'Change in avg. # of<br>cars/household<br>per CC vehicle introduced<br>(Deciles)'
+            elif plot_var == 'ChangeEVuptake':
+                label = 'Percentage change of<br>EV drivers<br>per CC vehicle introduced<br>(Deciles)'
 
             hover_data = {col: True for col in hover_vars}
             data.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
