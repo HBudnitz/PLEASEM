@@ -68,7 +68,7 @@ with ui.sidebar():
                 "metric2",
                 "Car Ownership Change Type",
                 {'ChangeEVuptake': 'Increase in EV uptake due to car club (cars)', 'CCredCarOwn': 'Reduction in car ownership due to car club (cars)'},
-                selected='ChangeEVuptake',
+                selected='CCredCarOwn',
             )
 
 with ui.layout_column_wrap(fill=False):
