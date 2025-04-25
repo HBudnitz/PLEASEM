@@ -81,7 +81,7 @@ with ui.layout_column_wrap(fill=False):
             By leveraging open data on vehicle emissions, mileage, and car ownership, PLEASEM **estimates carbon savings and changes in EV adoption** from replacing private cars with shared electric vehicles. 
             Unlike traditional models based on urban car-sharing schemes, this tool **highlights the place-specific impact** of shared electric mobility, making it particularly useful for rural and suburban areas where data has been scarce. 
             **Users can adjust parameters** to benchmark conservative estimates of emission reductions and policy outcomes, providing data-driven insights for sustainable transport planning.<br><br>
-            For any queries, please email: hannah.budnitz@ouce.ox.ac.uk (please use 'PLEASEM' in the subject line).
+            For any queries or to provide feedback, please email: hannah.budnitz@ouce.ox.ac.uk (please use 'PLEASEM' in the subject line).
             """
         )
 
