@@ -81,14 +81,14 @@ VehFleet$Diesel <- VehFleet$Diesel2024Q4/VehFleet$TotalCars
 VehFleet$Hybrid <- VehFleet$Hybrid2024Q4/VehFleet$TotalCars
 VehFleet$BEV <- VehFleet$BEV2024Q4/VehFleet$TotalCars
 VehFleet$PHEV <- VehFleet$PHEV2024Q4/VehFleet$TotalCars
+#2 upper tier LAs have different codes in VehFleet files that are in Mileage files
+#Somerset and North Yorkshire (changed lower tier code to upper tier code)
+VehFleet$`Local Authority Code` <- if_else(VehFleet$`Local Authority Code` == "E10000027", 
+                                               "E06000066", VehFleet$`Local Authority Code`)
+VehFleet$`Local Authority Code` <- if_else(VehFleet$`Local Authority Code` == "E10000023", 
+                                               "E06000065", VehFleet$`Local Authority Code`)
 TrafficFleet <- left_join(VehFleet, Traffic) #423 upper and lower tier authorities
 #Clean dataframe and prepare for joining to geojson
-#4 upper tier LAs have different codes in VehFleet files that are in Mileage files
-#Somerset and North Yorkshire (changed lower tier code to upper tier code)
-TrafficFleet$`Local Authority Code` <- if_else(TrafficFleet$`Local Authority Code` == "E10000027", 
-                                               "E06000066", TrafficFleet$`Local Authority Code`)
-TrafficFleet$`Local Authority Code` <- if_else(TrafficFleet$`Local Authority Code` == "E10000023", 
-                                               "E06000065", TrafficFleet$`Local Authority Code`)
 #Three authorities have different names on the geojson
 TrafficFleet$`Local Authority` <- if_else(TrafficFleet$`Local Authority` == "Herefordshire", 
                                    "Herefordshire, County of", TrafficFleet$`Local Authority`)
