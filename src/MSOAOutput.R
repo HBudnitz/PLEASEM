@@ -18,29 +18,28 @@ LSOAoutput <- left_join(Lookup, HHolds)
 #Add Car registration rates by LSOA
 #Table veh0125: https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-files
 #Columns 1, 3, 4, 5, and 6 extracted to reduce size to save to Github
-AllVehReg <- fread("../dashboard/data/raw_data/df_VEH0125_col13456_licensedCars.csv")
+AllVehReg <- fread("../dashboard/data/raw_data/df_VEH0125_col13456.csv")
 AllVehReg$LicenceStatus <- as.factor(AllVehReg$LicenceStatus)
 #remove 'SORN' as are registered as such if broken, untaxed, etc - not allowed on road
 AllVehReg <- AllVehReg[which(AllVehReg$LicenceStatus == "Licensed"),]
-names(AllVehReg)[1] <- "LSOA11CD" 
 AllVehReg$BodyType <- as.factor(AllVehReg$BodyType)
 AllVehReg$Keepership <- as.factor(AllVehReg$Keepership)
 #BodyType include Cars only, not Motorcycles or Other body types
 #Keepership include private and company, as company cars a key form of car ownership, esp for EVs
 AllVehReg <- AllVehReg[which(AllVehReg$BodyType == "Cars"),] 
 AllVehReg <- AllVehReg[which(AllVehReg$Keepership == "Total"),] #42620 obs - extra LSOAs because include Scotland / NI?
-AllVehReg$`2024 Q4` <- as.numeric(AllVehReg$`2024 Q4`)
+AllVehReg$`2025 Q1` <- as.numeric(AllVehReg$`2025 Q1`)
 #Keep only latest quarter and LSOA11 code
 AllVehReg <- AllVehReg[,c(1,5)]
-names(AllVehReg)[2] <- "VehsReg2024Q4"
+names(AllVehReg)[2] <- "VehsReg2025Q1"
 LSOAoutput <- left_join(LSOAoutput, AllVehReg)
-LSOAoutput <- LSOAoutput[!is.na(LSOAoutput$VehsReg2024Q4),] #remove Scotland - 34753 obs
+LSOAoutput <- LSOAoutput[!is.na(LSOAoutput$VehsReg2025Q1),] #remove Scotland - 34753 obs
 #round 53 LSOA outliers to account for where there are car rental businesses, fleets registered, etc 
 #double max hholds per LSOA is 3954, so maximum capped at 4k registered cars per LSOA
-LSOAoutput$VehsReg2024Q4 <- if_else(LSOAoutput$VehsReg2024Q4 > 4000, 
-                                        4000, LSOAoutput$VehsReg2024Q4)
+LSOAoutput$VehsReg2025Q1 <- if_else(LSOAoutput$VehsReg2025Q1 > 4000, 
+                                        4000, LSOAoutput$VehsReg2025Q1)
 #Rates of cars registered by total households 
-LSOAoutput$CarOwnRates <- LSOAoutput$VehsReg2024Q4 / LSOAoutput$TotHhold
+LSOAoutput$CarOwnRates <- LSOAoutput$VehsReg2025Q1 / LSOAoutput$TotHhold
 #EV registrations by LSOA - all plug-in vehicles, inc hybrids and Range extended
 #Table veh0145: https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-files
 #Columns 1, 3, 4, and 5 extracted to reduce size to save to Github
@@ -52,20 +51,20 @@ EVReg$Keepership <- as.factor(EVReg$Keepership)
 EVReg <- EVReg[which(EVReg$Fuel == "Battery electric"),] 
 EVReg <- EVReg[which(EVReg$Keepership == "Total"),] 
 EVReg <- EVReg[,c(1,4)]
-EVReg$`2024 Q4` <- as.numeric(EVReg$`2024 Q4`)
-names(EVReg)[2] <- "EV2024Q4"
-EVReg$EV2024Q4 <- if_else(is.na(EVReg$EV2024Q4),0,EVReg$EV2024Q4)
+EVReg$`2025 Q1` <- as.numeric(EVReg$`2025 Q1`)
+names(EVReg)[2] <- "EV2025Q1"
+EVReg$EV2025Q1 <- if_else(is.na(EVReg$EV2025Q1),0,EVReg$EV2025Q1)
 LSOAoutput <- left_join(LSOAoutput,EVReg)
 #round 17 outliers as did with total vehs - double max hholds per LSOA is 3954, so rounded to 4k
-LSOAoutput$EV2024Q4 <- if_else(LSOAoutput$EV2024Q4 > 4000, 
-                                   4000, LSOAoutput$EV2024Q4)
-LSOAoutput$EVRate <- (LSOAoutput$EV2024Q4/LSOAoutput$VehsReg2024Q4)
+LSOAoutput$EV2025Q1 <- if_else(LSOAoutput$EV2025Q1 > 4000, 
+                                   4000, LSOAoutput$EV2025Q1)
+LSOAoutput$EVRate <- (LSOAoutput$EV2025Q1/LSOAoutput$VehsReg2025Q1)
 #LSOA reduction in car ownership rates
-LSOAoutput$CCCarOwn <- (LSOAoutput$VehsReg2024Q4 - 9)/LSOAoutput$TotHhold
+LSOAoutput$CCCarOwn <- (LSOAoutput$VehsReg2025Q1 - 9)/LSOAoutput$TotHhold
 LSOAoutput$CCredCarOwn <- (LSOAoutput$CCCarOwn - LSOAoutput$CarOwnRates)
 #LSOA changes in EV uptake
-LSOAoutput$EVincCC <- (LSOAoutput$EV2024Q4 + 9)
-LSOAoutput$EVRateincCC <- (LSOAoutput$EVincCC/(LSOAoutput$VehsReg2024Q4-8))
+LSOAoutput$EVincCC <- (LSOAoutput$EV2025Q1 + 9)
+LSOAoutput$EVRateincCC <- (LSOAoutput$EVincCC/(LSOAoutput$VehsReg2025Q1-8))
 LSOAoutput$ChangeEVuptake <- (LSOAoutput$EVRateincCC - LSOAoutput$EVRate)*100
 #aggregate LAD22CD&NM, total households, car ownership and EV uptake by MSOA into new df
 MSOA_LAD22NM <- distinct(LSOAoutput[,c("MSOA21CD","LAD22CD","LAD22NM")])
@@ -74,12 +73,12 @@ TotHholdMSOA <- summarise(group_by(LSOAoutput, MSOA21CD),
 names(TotHholdMSOA)[2] <- "TotHhold"
 MSOAoutput <- left_join(MSOA_LAD22NM, TotHholdMSOA)
 VehsRegMSOA <- summarise(group_by(LSOAoutput, MSOA21CD), 
-                           sum(VehsReg2024Q4))
+                           sum(VehsReg2025Q1))
 names(VehsRegMSOA)[2]<- "VehsReg"
 MSOAoutput <- left_join(MSOAoutput, VehsRegMSOA)
 MSOAoutput$CarOwnRates <- MSOAoutput$VehsReg / MSOAoutput$TotHhold
 EVRegMSOA <- summarise(group_by(LSOAoutput, MSOA21CD), 
-                       sum(EV2024Q4, na.rm = T))
+                       sum(EV2025Q1, na.rm = T))
 names(EVRegMSOA)[2]<-"EVReg"
 MSOAoutput <- left_join(MSOAoutput, EVRegMSOA)
 MSOAoutput$EVRate <- (MSOAoutput$EVReg/MSOAoutput$VehsReg)
@@ -120,12 +119,12 @@ TotHholdLAD <- summarise(group_by(LSOAoutput, LAD22CD),
 names(TotHholdLAD) [2] <- "TotHhold"
 LADoutput <- left_join(LAD22NM,TotHholdLAD)
 VehsRegLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
-                        sum(VehsReg2024Q4))
+                        sum(VehsReg2025Q1))
 names(VehsRegLAD)[2]<- "VehsReg"
 LADoutput <- left_join(LADoutput, VehsRegLAD)
 LADoutput$CarOwnRates <- LADoutput$VehsReg / LADoutput$TotHhold
 EVRegLAD <- summarise(group_by(LSOAoutput, LAD22CD), 
-                       sum(EV2024Q4, na.rm = T))
+                       sum(EV2025Q1, na.rm = T))
 names(EVRegLAD)[2]<-"EVReg"
 LADoutput <- left_join(LADoutput, EVRegLAD)
 LADoutput$EVRate <- (LADoutput$EVReg/LADoutput$VehsReg)

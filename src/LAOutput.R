@@ -13,16 +13,16 @@ names(VehFleet)[2:5]<- c("Fuel","Keepership","Local Authority Code","Local Autho
 VehFleet$BodyType <- as.factor(VehFleet$BodyType)
 VehFleet$Fuel <- as.factor(VehFleet$Fuel)
 VehFleet$Keepership <- as.factor(VehFleet$Keepership)
-VehFleet$X2024.Q4 <- (as.numeric(VehFleet$X2024.Q4))*1000
+VehFleet$X2025.Q1 <- (as.numeric(VehFleet$X2025.Q1))*1000
 VehFleet <- VehFleet[which(VehFleet$BodyType == "Cars"),]
 VehFleet <- VehFleet[which(VehFleet$Keepership == "Total"),]
 VehFleet <- VehFleet[which(VehFleet$`Local Authority Code` != "[z]"),]
 Diesel <- VehFleet[which(VehFleet$Fuel == "Diesel"),c(4,6)]
-names(Diesel)[2] <- "Diesel2024Q4"
+names(Diesel)[2] <- "Diesel2025Q1"
 Hybrid <- VehFleet[which(VehFleet$Fuel == "Hybrid electric (petrol)"),c(4,6)]
-names(Hybrid)[2] <- "Hybrid2024Q4"
+names(Hybrid)[2] <- "Hybrid2025Q1"
 Petrol <- VehFleet[which(VehFleet$Fuel == "Petrol"),c(4,6)]
-names(Petrol)[2] <- "Petrol2024Q4"
+names(Petrol)[2] <- "Petrol2025Q1"
 VehFleet <- left_join(Petrol, Diesel)
 VehFleet <- left_join(VehFleet, Hybrid)
 #Data on full EVs and plug in hybrids
@@ -34,14 +34,14 @@ names(Electric)[4:5]<- c("Local Authority Code","Local Authority")
 Electric$BodyType <- as.factor(Electric$BodyType)
 Electric$Fuel <- as.factor(Electric$Fuel)
 Electric$Keepership <- as.factor(Electric$Keepership)
-Electric$X2024.Q4 <- sub(",", "",Electric$X2024.Q4)
-Electric$X2024.Q4 <- as.numeric(Electric$X2024.Q4)
+Electric$X2025.Q1 <- sub(",", "",Electric$X2025.Q1)
+Electric$X2025.Q1 <- as.numeric(Electric$X2025.Q1)
 Electric <- Electric[which(Electric$BodyType == "Cars"),]
 Electric <- Electric[which(Electric$Keepership == "Total"),]
 Electric <- Electric[which(Electric$`Local Authority Code` != "[z]"),]
 BEV <- Electric[which(Electric$Fuel == "Battery electric"),c(4,6)]
-names(BEV)[2] <- "BEV2024Q4"
-BEV$BEV2024Q4 <- if_else(is.na(BEV$BEV2024Q4), 0,BEV$BEV2024Q4)
+names(BEV)[2] <- "BEV2025Q1"
+BEV$BEV2025Q1 <- if_else(is.na(BEV$BEV2025Q1), 0,BEV$BEV2025Q1)
 VehFleet <- left_join(VehFleet, BEV)
 PHEV <- Electric[which(Electric$Fuel == "Plug-in hybrid electric (petrol)"),c(4,6)]
 names(PHEV)[2] <- "PHEVpet"
@@ -50,10 +50,10 @@ PHEV2 <- Electric[which(Electric$Fuel == "Plug-in hybrid electric (diesel)"),c(4
 names(PHEV2)[2] <- "PHEVd"
 PHEV2$PHEVd <- if_else(is.na(PHEV2$PHEVd), 0,PHEV2$PHEVd)
 PHEV3 <- Electric[which(Electric$Fuel == "Range extended electric"),c(4,6)]
-PHEV3$X2024.Q4 <- if_else(is.na(PHEV3$X2024.Q4), 0,PHEV3$X2024.Q4)
+PHEV3$X2025.Q1 <- if_else(is.na(PHEV3$X2025.Q1), 0,PHEV3$X2025.Q1)
 PHEV <- left_join(PHEV, PHEV2)
 PHEV <- left_join(PHEV, PHEV3)
-PHEV$PHEV2024Q4 <- rowSums(PHEV[2:4])
+PHEV$PHEV2025Q1 <- rowSums(PHEV[2:4])
 PHEV <- PHEV[,c(1,5)]
 VehFleet <- left_join(VehFleet, PHEV)
 #Cumbria split into Cumberland (Allderdale, Copeland, Carlisle) and
@@ -76,19 +76,19 @@ VehFleet <- rbind(VehFleet, WestmorlandFurness2)
 VehFleet <- VehFleet %>% mutate_at(c(2:6), as.numeric)
 #Calculate total cars and percentages to determine 'average car' per upper tier LA
 VehFleet$TotalCars <- rowSums(VehFleet[2:6], na.rm = T)
-VehFleet$Petrol <- VehFleet$Petrol2024Q4/VehFleet$TotalCars
-VehFleet$Diesel <- VehFleet$Diesel2024Q4/VehFleet$TotalCars
-VehFleet$Hybrid <- VehFleet$Hybrid2024Q4/VehFleet$TotalCars
-VehFleet$BEV <- VehFleet$BEV2024Q4/VehFleet$TotalCars
-VehFleet$PHEV <- VehFleet$PHEV2024Q4/VehFleet$TotalCars
-#2 upper tier LAs have different codes in VehFleet files that are in Mileage files
-#Somerset and North Yorkshire (changed lower tier code to upper tier code)
-VehFleet$`Local Authority Code` <- if_else(VehFleet$`Local Authority Code` == "E10000027", 
-                                               "E06000066", VehFleet$`Local Authority Code`)
-VehFleet$`Local Authority Code` <- if_else(VehFleet$`Local Authority Code` == "E10000023", 
-                                               "E06000065", VehFleet$`Local Authority Code`)
+VehFleet$Petrol <- VehFleet$Petrol2025Q1/VehFleet$TotalCars
+VehFleet$Diesel <- VehFleet$Diesel2025Q1/VehFleet$TotalCars
+VehFleet$Hybrid <- VehFleet$Hybrid2025Q1/VehFleet$TotalCars
+VehFleet$BEV <- VehFleet$BEV2025Q1/VehFleet$TotalCars
+VehFleet$PHEV <- VehFleet$PHEV2025Q1/VehFleet$TotalCars
 TrafficFleet <- left_join(VehFleet, Traffic) #423 upper and lower tier authorities
 #Clean dataframe and prepare for joining to geojson
+#4 upper tier LAs have different codes in VehFleet files that are in Mileage files
+#Somerset and North Yorkshire (changed lower tier code to upper tier code)
+TrafficFleet$`Local Authority Code` <- if_else(TrafficFleet$`Local Authority Code` == "E10000027", 
+                                               "E06000066", TrafficFleet$`Local Authority Code`)
+TrafficFleet$`Local Authority Code` <- if_else(TrafficFleet$`Local Authority Code` == "E10000023", 
+                                               "E06000065", TrafficFleet$`Local Authority Code`)
 #Three authorities have different names on the geojson
 TrafficFleet$`Local Authority` <- if_else(TrafficFleet$`Local Authority` == "Herefordshire", 
                                    "Herefordshire, County of", TrafficFleet$`Local Authority`)
@@ -104,18 +104,18 @@ TrafficFleet$DieselMile <- TrafficFleet$cars_and_taxis*TrafficFleet$Diesel
 TrafficFleet$HybridMile <- TrafficFleet$cars_and_taxis*TrafficFleet$Hybrid
 TrafficFleet$BEVMile <- TrafficFleet$cars_and_taxis*TrafficFleet$BEV
 TrafficFleet$PHEVMile <- TrafficFleet$cars_and_taxis*TrafficFleet$PHEV
-TrafficFleet$PetrolCO2e <- TrafficFleet$PetrolMile*0.26473
-TrafficFleet$DieselCO2e <- TrafficFleet$DieselMile*0.27334
-TrafficFleet$HybridCO2e <- TrafficFleet$HybridMile*0.20288
-TrafficFleet$BEVCO2e <- TrafficFleet$BEVMile*0.07015+(TrafficFleet$BEVMile*0.00620)
-TrafficFleet$PHEVCO2e <- TrafficFleet$PHEVMile*(0.14989+0.02208+0.00195)
+TrafficFleet$PetrolCO2e <- TrafficFleet$PetrolMile*0.26187
+TrafficFleet$DieselCO2e <- TrafficFleet$DieselMile*0.27849
+TrafficFleet$HybridCO2e <- TrafficFleet$HybridMile*0.20639
+TrafficFleet$BEVCO2e <- TrafficFleet$BEVMile*0.05894+(TrafficFleet$BEVMile*0.00618)
+TrafficFleet$PHEVCO2e <- TrafficFleet$PHEVMile*(0.14751+0.01885+0.00197)
 #sum baseline CO2e and baseline CO2e and mileage for per vehicle in LA fleet
 TrafficFleet$BaseCO2e <- rowSums(TrafficFleet[,23:27], na.rm = TRUE)
 TrafficFleet$pCarBaseCO2e <- TrafficFleet$BaseCO2e/TrafficFleet$TotalCars
 TrafficFleet$pCarAnnMile <- TrafficFleet$cars_and_taxis/TrafficFleet$TotalCars
 #use mileage in fleet to create conversion factors for CO2 emissions reductions per CC car
-TrafficFleet$pBEVAnnCO2e <- TrafficFleet$pCarAnnMile*0.07015+(TrafficFleet$pCarAnnMile*0.00620)
-TrafficFleet$pHyVAnnCO2e <- TrafficFleet$pCarAnnMile*0.20288
+TrafficFleet$pBEVAnnCO2e <- TrafficFleet$pCarAnnMile*0.05894+(TrafficFleet$pCarAnnMile*0.00618)
+TrafficFleet$pHyVAnnCO2e <- TrafficFleet$pCarAnnMile*0.16833
 TrafficFleet$reduceCO2pBEVcc <- TrafficFleet$pCarBaseCO2e - TrafficFleet$pBEVAnnCO2e
 TrafficFleet$reduceCO2pHyVc <- TrafficFleet$pCarBaseCO2e - TrafficFleet$pHyVAnnCO2e
 #output to use in mapping
