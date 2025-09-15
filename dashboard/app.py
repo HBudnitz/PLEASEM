@@ -106,7 +106,7 @@ with ui.layout_column_wrap(fill=False):
         @render.text
         def ev_prop():
             total_cars = filtered_df()['TotalCars'].sum()
-            total_alt = filtered_df()['BEV2024Q4'].sum() + filtered_df()['PHEV2024Q4'].sum() + filtered_df()['Hybrid2024Q4'].sum()
+            total_alt = filtered_df()['BEV2025Q1'].sum() + filtered_df()['PHEV2025Q1'].sum() + filtered_df()['Hybrid2025Q1'].sum()
             alt_prop = (total_alt / total_cars)*100
             return f"{round(alt_prop,2)}%"
 
@@ -420,7 +420,7 @@ with ui.layout_columns(col_widths=[8, 4]):
         def location_selector():
             data, level_var = get_data()
             if level_var == 'LAD22NM':
-                return_str = f"Select {level_dic[level_var]} to see the respective car ownership change per car club BEV:<br>"
+                return_str = f"Select {level_dic[level_var]} to see the respective car ownership change per car club BEV - MSOAs are listed in alphabetical order by LAD:<br>"
                 level_var_ = 'LAD22NM'
             else:
                 return_str = f"Select {level_dic[level_var]} to see the respective car ownership change per car club BEV:<br>"

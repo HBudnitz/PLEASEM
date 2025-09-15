@@ -59,20 +59,20 @@ VehFleet <- left_join(VehFleet, PHEV)
 #Cumbria split into Cumberland (Allderdale, Copeland, Carlisle) and
 #Westmorland and Furness (South Lakeland, Eden, Barrow in Furness)
 #create new row for each, sum districts fleet make-up
-#code may no longer be needed if data updates have also updated authority codes
-Cumberland <- VehFleet[which(VehFleet$`Local Authority Code` == 
-                        "E07000026" | VehFleet$`Local Authority Code` == 
-                        "E07000028" | VehFleet$`Local Authority Code` == 
-                        "E07000029"),]
-Cumberland2 <- c("E06000063", colSums(Cumberland[,2:6]))
-VehFleet <- rbind(VehFleet, Cumberland2)
-WestmorlandFurness <- VehFleet[which(VehFleet$`Local Authority Code` == 
-                         "E07000027" | VehFleet$`Local Authority Code` == 
-                         "E07000030" | VehFleet$`Local Authority Code` == 
-                                       "E07000031"),]
-WestmorlandFurness <- WestmorlandFurness %>% mutate_at(c(2:6), as.numeric)
-WestmorlandFurness2 <- c("E06000064", colSums(WestmorlandFurness[,2:6]))
-VehFleet <- rbind(VehFleet, WestmorlandFurness2)
+#code no longer be needed as data updates have also updated authority codes
+#Cumberland <- VehFleet[which(VehFleet$`Local Authority Code` == 
+#                        "E07000026" | VehFleet$`Local Authority Code` == 
+#                        "E07000028" | VehFleet$`Local Authority Code` == 
+#                        "E07000029"),]
+#Cumberland2 <- c("E06000063", colSums(Cumberland[,2:6]))
+#VehFleet <- rbind(VehFleet, Cumberland2)
+#WestmorlandFurness <- VehFleet[which(VehFleet$`Local Authority Code` == 
+#                         "E07000027" | VehFleet$`Local Authority Code` == 
+#                         "E07000030" | VehFleet$`Local Authority Code` == 
+#                                       "E07000031"),]
+#WestmorlandFurness <- WestmorlandFurness %>% mutate_at(c(2:6), as.numeric)
+#WestmorlandFurness2 <- c("E06000064", colSums(WestmorlandFurness[,2:6]))
+#VehFleet <- rbind(VehFleet, WestmorlandFurness2)
 VehFleet <- VehFleet %>% mutate_at(c(2:6), as.numeric)
 #Calculate total cars and percentages to determine 'average car' per upper tier LA
 VehFleet$TotalCars <- rowSums(VehFleet[2:6], na.rm = T)
