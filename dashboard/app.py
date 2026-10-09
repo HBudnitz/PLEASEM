@@ -171,7 +171,16 @@ with ui.layout_columns(col_widths=[8, 4]):
             ))
 
             fig.update_layout(
-                geo=dict(scope='europe'),
+                geo=dict(
+                    scope='europe',
+                    projection_type='mercator',
+                    showframe=False,
+                    showcoastlines=False,
+                    showland=True,
+                    landcolor='white',
+                    showcountries=True,
+                    countrycolor='lightgray'
+                ),
                 margin={"r":0,"t":0,"l":0,"b":0},
                 width=750,
                 height=750
@@ -379,7 +388,16 @@ with ui.layout_columns(col_widths=[8, 4]):
             ))
 
             fig.update_layout(
-                geo=dict(scope='europe'),
+                geo=dict(
+                    scope='europe',
+                    projection_type='mercator',
+                    showframe=False,
+                    showcoastlines=False,
+                    showland=True,
+                    landcolor='white',
+                    showcountries=True,
+                    countrycolor='lightgray'
+                ),
                 margin={"r":0,"t":0,"l":0,"b":0},
                 width=750,
                 height=650
