@@ -39,7 +39,7 @@ with ui.sidebar():
 
     # Overall total car per local authority filter
     ui.markdown("*Filter for national averages (National Average Tiles)*")
-    ui.input_slider("AvgMil", "Avg. Mileage per Car per County", min=int(df_county['pCarAnnMile'].min()), max=int(df_county['pCarAnnMile'].max()), value=[int(df_county['pCarAnnMile'].min()),int(df_cou[...]
+    ui.input_slider("AvgMil", "Avg. Mileage per Car per County", min=int(df_county['pCarAnnMile'].min()), max=int(df_county['pCarAnnMile'].max()), value=[int(df_county['pCarAnnMile'].min()),int(df_county['pCarAnnMile'].max())])
     ui.markdown("<br>*Variable controls for maps*")
 
     with ui.accordion(id="acc", open=False):
@@ -79,9 +79,9 @@ with ui.layout_column_wrap(fill=False):
 
         ui.markdown(
             """**PLEASEM** is an open-source tool designed to help you **assess the potential benefits of electric car clubs** wherever you live.
-            By leveraging open data on vehicle emissions, mileage, and car ownership, PLEASEM **estimates carbon savings and changes in EV adoption** from replacing private cars with shared electr[...]
-            Unlike traditional models based on urban car-sharing schemes, this tool **highlights the place-specific impact** of shared electric mobility, making it particularly useful for rural an[...]
-            **Users can adjust parameters** to benchmark conservative estimates of emission reductions and policy outcomes, providing data-driven insights for sustainable transport planning.<br><b[...]
+            By leveraging open data on vehicle emissions, mileage, and car ownership, PLEASEM **estimates carbon savings and changes in EV adoption** from replacing private cars with shared electric vehicles. 
+            Unlike traditional models based on urban car-sharing schemes, this tool **highlights the place-specific impact** of shared electric mobility, making it particularly useful for rural and suburban areas where data has been scarce. 
+            **Users can adjust parameters** to benchmark conservative estimates of emission reductions and policy outcomes, providing data-driven insights for sustainable transport planning.<br><br>
             For any queries or to provide feedback, please email: hannah.budnitz@ouce.ox.ac.uk (use 'PLEASEM' in the subject line).
             """
         )
@@ -250,7 +250,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             em_red_pot_multiplier = sel_mil/mil
             em_red_pot = df_county[df_county['Local Authority']==loc_auth][plot_var].iloc[0]*em_red_pot_multiplier
             return ui.markdown(
-                f"**Emission reduction potential** per car club {fig_trace_lab} in {loc_auth}: **{int(em_red_pot)}kg CO2e** at **{sel_mil} miles** and existing **private car fleet split** (see pi[...]
+                f"**Emission reduction potential** per car club {fig_trace_lab} in {loc_auth}: **{int(em_red_pot)}kg CO2e** at **{sel_mil} miles** and existing **private car fleet split** (see pie chart below)"
                 )
 
         @render_plotly
@@ -469,7 +469,7 @@ with ui.layout_columns(col_widths=[8, 4]):
                         f"**Selected location:** {loc_auth}<br>"
                         f"**Car Ownership Rate:** {round(car_own_rate, 2)} cars per household.<br>"
                         f"**EV Share in overall car fleet without CC:** {round(ev_rate, 2)}% of {int(total_cars)} total registered vehicles.<br>"
-                    ), ui.card_footer(f"Note: Weighted averages are used to account for differences in household numbers within LSOAs and MSOAs encompassed by {loc_auth}, to reflect that the chan[...]
+                    ), ui.card_footer(f"Note: Weighted averages are used to account for differences in household numbers within LSOAs and MSOAs encompassed by {loc_auth}, to reflect that the change is per shared BEV, whether one is introduced in every MSOA, no matter its population, or if multiple shared BEVs serve more than one adjacent MSOA."),
                 else:
                     return ui.markdown(
                         f"**Selected location:** {loc_auth}<br>"
