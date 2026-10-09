@@ -151,7 +151,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             data['Hybrid'] = data['Hybrid'].fillna(0)*100
 
             # plot map using graph_objects
-            fig = go.Figure(data=go.Choroplethmapbox(
+            fig = go.Figure(data=go.Choropleth(
                 locations=data[loc_var],
                 z=data[plot_var],
                 geojson=gdf_county,
@@ -171,11 +171,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             ))
 
             fig.update_layout(
-                mapbox_style="carto-positron",
-                mapbox=dict(
-                    center={"lat": 55.09621, "lon": -4.0286298},
-                    zoom=4.75,
-                ),
+                geo=dict(scope='europe'),
                 margin={"r":0,"t":0,"l":0,"b":0},
                 width=750,
                 height=750
@@ -219,18 +215,18 @@ with ui.layout_columns(col_widths=[8, 4]):
         def slider_ui():
             # Get the selected local authority value (reactively)
             selected_loc = input.metric1_lad()
-            
+
             # Filter the DataFrame for the selected local authority.
             base_val = df_county[df_county['Local Authority'] == selected_loc]['pCarAnnMile'].iloc[0]
             min_val = round(base_val*0.5,0)
             init_val = round(base_val,0)
             max_val = round(base_val*1.5,0)
             step_val = round((max_val - min_val) / 100.0,0)
-        
+
             # Return a slider UI element dynamically based on the filtered data.
             return ui.input_slider(
-                "metric1_mil", 
-                "Select avg. annual mileage:", 
+                "metric1_mil",
+                "Select avg. annual mileage:",
                 int(min_val),
                 int(max_val),
                 int(init_val),
@@ -276,21 +272,21 @@ with ui.layout_columns(col_widths=[8, 4]):
 
             # Update the layout to center the pie chart
             fig.update_layout(
-                showlegend=False,  # Remove legend
-                autosize=False,  # Disable automatic resizing
-                width=300,  # Fixed width
-                height=300,  # Fixed height
-                margin=dict(l=0, r=0, t=0, b=0),  # Remove extra margins
-                uniformtext_minsize=12,  # Set uniform text size
-                uniformtext_mode='hide',  # Avoid overlapping text
-                paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
-                plot_bgcolor='rgba(0,0,0,0)'  # Transparent plot background
+                showlegend=False,
+                autosize=False,
+                width=300,
+                height=300,
+                margin=dict(l=0, r=0, t=0, b=0),
+                uniformtext_minsize=12,
+                uniformtext_mode='hide',
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)'
             )
 
             # Update the layout to show percentage and fuel type inside the slices
             fig.update_traces(
-                textinfo='percent+label',  # Show percentage and label
-                insidetextorientation='horizontal'  # Keep text horizontal inside slices
+                textinfo='percent+label',
+                insidetextorientation='horizontal'
             )
 
             # Remove the legend
@@ -325,7 +321,6 @@ with ui.layout_columns(col_widths=[8, 4]):
                     "Change in avg. # of cars/household<br>per CC vehicle introduced (weighted by MSOA): %{customdata[3]:.3f}<br>"
                 )
                 data = df_lad.copy()
-            
             else:
                 gdf = gdf_msoa
                 loc_var = "MSOA21CD"
@@ -371,7 +366,7 @@ with ui.layout_columns(col_widths=[8, 4]):
                 data['deciles'] = 11 - data['deciles']
 
             # plot map using graph_objects
-            fig = go.Figure(data=go.Choroplethmapbox(
+            fig = go.Figure(data=go.Choropleth(
                 locations=data[loc_var],
                 z=data['deciles'],
                 geojson=gdf,
@@ -384,11 +379,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             ))
 
             fig.update_layout(
-                mapbox_style="carto-positron",
-                mapbox=dict(
-                    center={"lat": 53.09621, "lon": -2.0286298},
-                    zoom=5.25,
-                ),
+                geo=dict(scope='europe'),
                 margin={"r":0,"t":0,"l":0,"b":0},
                 width=750,
                 height=650
@@ -483,10 +474,10 @@ with ui.layout_columns(col_widths=[8, 4]):
         def cc_vehs_ui():
             # Return a slider UI element dynamically based on the filtered data.
             return ui.input_slider(
-                "cc_vehs", 
-                "Select number of BEVs to be introduced to car club fleet to see how the proportion of regular EV drivers in your area could increase with each additional shared BEV:", 
+                "cc_vehs",
+                "Select number of BEVs to be introduced to car club fleet to see how the proportion of regular EV drivers in your area could increase with each additional shared BEV:",
                 1,
-                10, 
+                10,
                 1,
                 step=1)
 
