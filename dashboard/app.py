@@ -106,7 +106,7 @@ with ui.layout_column_wrap(fill=False):
         @render.text
         def ev_prop():
             total_cars = filtered_df()['TotalCars'].sum()
-            total_alt = filtered_df()['BEV2025Q1'].sum() + filtered_df()['PHEV2025Q1'].sum() + filtered_df()['Hybrid2025Q1'].sum()
+            total_alt = filtered_df()['BEV2026Q1'].sum() + filtered_df()['PHEV2026Q1'].sum() + filtered_df()['Hybrid2026Q1'].sum()
             alt_prop = (total_alt / total_cars)*100
             return f"{round(alt_prop,2)}%"
 
