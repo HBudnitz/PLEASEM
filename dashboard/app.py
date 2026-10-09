@@ -8,6 +8,7 @@
 import seaborn as sns
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from plotly.colors import sample_colorscale, sequential
 from faicons import icon_svg
 from shinywidgets import render_plotly
@@ -38,7 +39,7 @@ with ui.sidebar():
 
     # Overall total car per local authority filter
     ui.markdown("*Filter for national averages (National Average Tiles)*")
-    ui.input_slider("AvgMil", "Avg. Mileage per Car per County", min=int(df_county['pCarAnnMile'].min()), max=int(df_county['pCarAnnMile'].max()), value=[int(df_county['pCarAnnMile'].min()),int(df_county['pCarAnnMile'].max())])
+    ui.input_slider("AvgMil", "Avg. Mileage per Car per County", min=int(df_county['pCarAnnMile'].min()), max=int(df_county['pCarAnnMile'].max()), value=[int(df_county['pCarAnnMile'].min()),int(df_cou[...]
     ui.markdown("<br>*Variable controls for maps*")
 
     with ui.accordion(id="acc", open=False):
@@ -78,9 +79,9 @@ with ui.layout_column_wrap(fill=False):
 
         ui.markdown(
             """**PLEASEM** is an open-source tool designed to help you **assess the potential benefits of electric car clubs** wherever you live.
-            By leveraging open data on vehicle emissions, mileage, and car ownership, PLEASEM **estimates carbon savings and changes in EV adoption** from replacing private cars with shared electric vehicles. 
-            Unlike traditional models based on urban car-sharing schemes, this tool **highlights the place-specific impact** of shared electric mobility, making it particularly useful for rural and suburban areas where data has been scarce. 
-            **Users can adjust parameters** to benchmark conservative estimates of emission reductions and policy outcomes, providing data-driven insights for sustainable transport planning.<br><br>
+            By leveraging open data on vehicle emissions, mileage, and car ownership, PLEASEM **estimates carbon savings and changes in EV adoption** from replacing private cars with shared electr[...]
+            Unlike traditional models based on urban car-sharing schemes, this tool **highlights the place-specific impact** of shared electric mobility, making it particularly useful for rural an[...]
+            **Users can adjust parameters** to benchmark conservative estimates of emission reductions and policy outcomes, providing data-driven insights for sustainable transport planning.<br><b[...]
             For any queries or to provide feedback, please email: hannah.budnitz@ouce.ox.ac.uk (use 'PLEASEM' in the subject line).
             """
         )
@@ -149,26 +150,14 @@ with ui.layout_columns(col_widths=[8, 4]):
             data['BEV'] = data['BEV'].fillna(0)*100
             data['Hybrid'] = data['Hybrid'].fillna(0)*100
 
-            # plot map
-            fig = px.choropleth_mapbox(
-                data,
+            # plot map using graph_objects
+            fig = go.Figure(data=go.Choroplethmapbox(
+                locations=data[loc_var],
+                z=data[plot_var],
                 geojson=gdf_county,
-                locations=loc_var,
-                color=plot_var,
                 featureidkey=geojson_loc_var,
-                color_continuous_scale="Viridis",
-                mapbox_style="carto-positron",
-                center={"lat": 55.09621, "lon": -4.0286298},
-                zoom=4.75,
-                hover_data={col: True for col in hover_vars},
-                custom_data=hover_vars,
-                labels={plot_var: label},
-            )
-
-            fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, width=750, height=750)
-
-            fig.update_traces(
-                marker_line_width=0.1,
+                colorscale="Viridis",
+                customdata=data[hover_vars].values,
                 hovertemplate=(
                     "<b>%{customdata[0]}</b><br>" +
                     "Total # of Cars: %{customdata[1]}<br>" +
@@ -176,8 +165,22 @@ with ui.layout_columns(col_widths=[8, 4]):
                     "Share of Hybrid vehicles in overall car fleet: %{customdata[3]:.3f}%<br>" +
                     "Avg. Annual Mileage per car: %{customdata[4]:.0f}<br>" +
                     f"CO2 reduction potential<br>per car club {fig_trace_lab} introduced:" + " %{customdata[5]:.0f}kg<extra></extra>"
-                )
+                ),
+                marker_line_width=0.1,
+                colorbar=dict(title=label),
+            ))
+
+            fig.update_layout(
+                mapbox_style="carto-positron",
+                mapbox=dict(
+                    center={"lat": 55.09621, "lon": -4.0286298},
+                    zoom=4.75,
+                ),
+                margin={"r":0,"t":0,"l":0,"b":0},
+                width=750,
+                height=750
             )
+
             return fig
 
     with ui.card(full_screen=True):
@@ -247,7 +250,7 @@ with ui.layout_columns(col_widths=[8, 4]):
             em_red_pot_multiplier = sel_mil/mil
             em_red_pot = df_county[df_county['Local Authority']==loc_auth][plot_var].iloc[0]*em_red_pot_multiplier
             return ui.markdown(
-                f"**Emission reduction potential** per car club {fig_trace_lab} in {loc_auth}: **{int(em_red_pot)}kg CO2e** at **{sel_mil} miles** and existing **private car fleet split** (see pie chart below)"
+                f"**Emission reduction potential** per car club {fig_trace_lab} in {loc_auth}: **{int(em_red_pot)}kg CO2e** at **{sel_mil} miles** and existing **private car fleet split** (see pi[...]
                 )
 
         @render_plotly
@@ -367,28 +370,30 @@ with ui.layout_columns(col_widths=[8, 4]):
             if plot_var == 'CCredCarOwn':
                 data['deciles'] = 11 - data['deciles']
 
-            # plot map
-            fig = px.choropleth_mapbox(
-                data,
+            # plot map using graph_objects
+            fig = go.Figure(data=go.Choroplethmapbox(
+                locations=data[loc_var],
+                z=data['deciles'],
                 geojson=gdf,
-                locations=loc_var,
-                color='deciles',
                 featureidkey=geojson_loc_var,
-                color_continuous_scale="Viridis",
-                mapbox_style="carto-positron",
-                center={"lat": 53.09621, "lon": -2.0286298},
-                zoom=5.25,
-                hover_data={col: True for col in hover_vars},
-                custom_data=hover_vars,
-                labels={'deciles': label},
-            )
-
-            fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, width=750, height=650)
-
-            fig.update_traces(
+                colorscale="Viridis",
+                customdata=data[hover_vars].values,
+                hovertemplate=hovertemplate,
                 marker_line_width=0.1,
-                hovertemplate=hovertemplate
+                colorbar=dict(title=label),
+            ))
+
+            fig.update_layout(
+                mapbox_style="carto-positron",
+                mapbox=dict(
+                    center={"lat": 53.09621, "lon": -2.0286298},
+                    zoom=5.25,
+                ),
+                margin={"r":0,"t":0,"l":0,"b":0},
+                width=750,
+                height=650
             )
+
             return fig
 
     with ui.card(full_screen=True):
@@ -464,7 +469,7 @@ with ui.layout_columns(col_widths=[8, 4]):
                         f"**Selected location:** {loc_auth}<br>"
                         f"**Car Ownership Rate:** {round(car_own_rate, 2)} cars per household.<br>"
                         f"**EV Share in overall car fleet without CC:** {round(ev_rate, 2)}% of {int(total_cars)} total registered vehicles.<br>"
-                    ), ui.card_footer(f"Note: Weighted averages are used to account for differences in household numbers within LSOAs and MSOAs encompassed by {loc_auth}, to reflect that the change is per shared BEV, whether one is introduced in every MSOA, no matter its population, or if multiple shared BEVs serve more than one adjacent MSOA."),
+                    ), ui.card_footer(f"Note: Weighted averages are used to account for differences in household numbers within LSOAs and MSOAs encompassed by {loc_auth}, to reflect that the chan[...]
                 else:
                     return ui.markdown(
                         f"**Selected location:** {loc_auth}<br>"
